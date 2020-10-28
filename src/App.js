@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import './App.css';
 import { Hello , Hello1 } from './Hello';
 import { Square } from './Square';
+import List from './List';
 
 function App() {
 
@@ -9,7 +10,7 @@ function App() {
   // useful when you want to prevent a function from being created on every single render. This is mainly useful when we useMemo hook in React
   // We create a state for a simple counter
   // We pass down a function to Hello compoenent here
-  // we will use this funciton passed doen in the Hello compoennt
+  // we will use this funciton passed down in the Hello compoennt
 
   // In normal situation its not a problem but when we use React.memo on the Hello component, we want the component to only rerender when the increment changes
   const [count, setCount] = useState(0);
@@ -66,6 +67,31 @@ function App() {
     // so with this its renderign each one on those every time we click on the buttons.
     // So we pass  the increment down and we dont have the onclick logic right here. We put the onlcik logic inside of Square
     // so now its not logging everytime we click the button
+  //************************************************************************************** */
+
+    const [number, setNumber] = useState(1);
+    const [dark, setDark] = useState(false)
+
+    // const getItems = () => {
+    //   return [number, number + 1, number + 2]
+    // }
+
+    // useCalback has exact same signature as useMemo(). 
+    // It takes second argument as dependency array which is just number in this case
+    // This stops 'updating items' being printed to the console when we click chnage theme button
+    // because the useCallback only recreated our getItems function when the number chnages and not when the 'dark' variable chnages
+    // This code looks similar to useMemo() hook but the diff is with useMemo takes a function and it returns to you the return value of that function.
+    // But useCallback takkes a function and that is what it returns. This allows us to pass parameters to this function (incrementor)
+    // we cant do this with useMemo because useMemo doesnt return a function.
+    // The only reason we would use useCallback is when we care about referential equality (same as useMemo usecase).
+    const getItems = useCallback((incrementer) => {
+      return [number + incrementer, number + 1 + incrementer, number + 2 + incrementer]
+    }, [number])
+
+    const theme = {
+      backgroundColor: dark ? '#333' : '#fff',
+      color: dark ? '#fff' : '#333'
+    } 
 
 
   return (
@@ -98,6 +124,15 @@ function App() {
           <Square increment={increment2}  n={n} key={n}/>
         )
       })}
+      <hr/>
+      {/* *************************************************************************** */}
+      <div style={theme}>
+        <input type="number" value={number} onChange={e => setNumber(parseInt(e.target.value))} />
+        <button onClick={() => setDark(prevDark => !prevDark)}>Toggle Theme</button>
+
+        {/*  we pass getItems function to the List component */}
+        <List getItems={getItems} />
+      </div>
     </div>
   );
 }
